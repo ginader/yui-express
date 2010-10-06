@@ -435,8 +435,111 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
         });
     });
 
+    app.get('/form', function(req, res) {
+        console.log('-------------------------------------------------');
 
-    app.listen(80);
+        YUI({
+            debug: DEBUG,
+            modules: {
+                'form-validate': {
+                    //For more detail see this file..
+                    fullpath: __dirname + '/assets/form.js'
+                }
+            }
+        }).use('node', 'local-demo', 'form-validate', 'querystring', function(page) {
+            
+            res.render('form.html', {
+                locals: {
+                    instance: page,
+                    content: '#content',
+                    sub: {
+                        title: 'demo'
+                    },
+                    after: function(Y, options, partial) {
+                        Y.one('title').set('innerHTML', 'demo');
+                        Y.all('#nav li.selected').removeClass('selected');
+                        Y.one('#nav li.form').addClass('selected');
+                        
+                        
+                        if (req.query && req.query.submit) {
+                            console.log('submitted');
+                            // prefill form fields
+                            var get = req.query;
+                            for(var name in get){
+                                if(get.hasOwnProperty(name)){
+                                    var value = get[name];
+                                    var el = Y.one('#test-form1 [name='+name+']');
+                                    el.set('value',value);
+                                    if(!el){
+                                        console.log('not found: "'+name+'"');
+                                    }
+                                }
+                            }    
+                        }
+                        
+                        
+                        var rules = 'bla';
+                        var localY = Y;
+                        var that = this;
+                        
+                        fs.readFile(__dirname + '/assets/form.rules.js','utf8', function (err, data) {
+                            if (err) throw err;
+                            var start = data.indexOf('[');
+                            if(start > 0){
+                                data = data.substring(start,data.length-1);
+                            }
+                            rules = JSON.parse(data);
+                            
+                        //     // this fails even though I use localY or that.Y
+                        //     var form = new localY.FormValidate({
+                        //         targetFormId: '#test-form1',
+                        //         debug: true,
+                        //         rules:[
+                        //           {
+                        //             name: 'firstname',
+                        //             required: true,
+                        //             requiredMsg: '"Vorname" ist ein Pflichtfeld!',
+                        //             validate: 'isText',
+                        //             validatedMsg: 'Bitte geben Sie nur Text in das Feld "Vorname" ein!'
+                        //           }
+                        //         ]
+                        //     })// .setErrorRenderer('label')
+                        //     .checkRules();
+                        });
+
+                        
+                        
+                        // works fine but can't access rules obviously
+                        var form = new localY.FormValidate({
+                            targetFormId: '#test-form1',
+                            debug: true,
+                            rules:[
+                              {
+                                name: 'firstname',
+                                required: true,
+                                requiredMsg: '"Vorname" ist ein Pflichtfeld!',
+                                validate: 'isText',
+                                validatedMsg: 'Bitte geben Sie nur Text in das Feld "Vorname" ein!'
+                              },
+                              {
+                                "name": "email",
+                                "required": true,
+                                "requiredMsg": "\"E-Mail\" ist ein Pflichtfeld!",
+                                "validate": "isEmail",
+                                "validatedMsg": "Bitte geben Sie eine gueltige E-Mail Adresse ein!"
+                              }
+                            ]
+                        })// .setErrorRenderer('label')
+                        .checkRules();
+
+
+                    }
+                }
+            });
+        });
+    });
+
+    app.listen(3200);
     if (DEBUG) {
         console.log('Server running at: http://localhost:3200/');
     }

@@ -1,0 +1,44 @@
+<h2>Form Validation</h2>
+
+<strong>Hinweis: Ausser dem Feld "Alter" sind alle Felder Pflichtfelder und müssen ausgefüllt werden!</strong>
+<form action="/form/" id="test-form1" method="get">
+  <fieldset>
+    <legend>Persönliche Daten</legend>
+    <label for="title">Anrede</label>
+    <select name="title" id="title">
+        <option value="">select</option>
+        <option value="Dr">Dr.</option>
+        <option value="God">God</option>
+    </select>
+    <br>
+    <label for="firstname">Vorname</label>
+    <input type="text" name="firstname" value="" id="firstname">
+    <br>
+    <label for="lastname">Nachname</label>
+    <input type="text" name="lastname" value="" id="lastname">
+    <br>
+    <label for="zip">Postleitzahl</label>
+    <input type="text" name="zip" value="" id="zip">
+    <br>
+    <label for="age">Alter</label>
+    <input type="text" name="age" value="" id="age">
+    <br>
+    <label for="city">Wohnort</label>
+    <input type="text" name="city" value="" id="city">
+    <br>
+    <label for="email">E-Mail</label>
+    <input type="text" name="email" value="" id="email">
+    <br>
+  </fieldset>
+  <fieldset>
+      <legend>Geschlecht</legend>
+      <label for="gender_female">Weiblich</label>
+      <input type="radio" name="gender" value="Weiblich" id="gender_female">
+      <label for="gender_male">Männlich</label>
+      <input type="radio" name="gender" value="Männlich" id="gender_male">
+      <label for="gender_undecisive">Unentschlossen</label>
+      <input type="radio" name="gender" value="Unentschlossen" id="gender_undecisive">
+  </fieldset>
+
+  <input type="submit" name="submit" value="Absenden">
+</form>
