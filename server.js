@@ -436,105 +436,92 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
     });
 
     app.get('/form', function(req, res) {
-        console.log('-------------------------------------------------');
-
-        YUI({
-            debug: DEBUG,
-            modules: {
-                'form-validate': {
-                    //For more detail see this file..
-                    fullpath: __dirname + '/assets/form.js'
+        res.render('form.html', {
+            locals: {
+                content: '#content',
+                use: ['dom'],
+                sub: {
+                    title: 'demo'
+                },
+                after: function(Y, options, partial) {
+                    Y.Get.domScript('/form.js');
+                    Y.Get.domScript('/form.rules.js');
+                    Y.Get.domScript('/form.init.js');
+                    Y.one('title').set('innerHTML', 'form');
+                    Y.all('#nav li.selected').removeClass('selected');
+                    Y.one('#nav li.form').addClass('selected');
                 }
             }
-        }).use('node', 'local-demo', 'form-validate', 'querystring', function(page) {
-            
-            res.render('form.html', {
-                locals: {
-                    instance: page,
-                    content: '#content',
-                    sub: {
-                        title: 'demo'
-                    },
-                    after: function(Y, options, partial) {
-                        Y.one('title').set('innerHTML', 'demo');
-                        Y.all('#nav li.selected').removeClass('selected');
-                        Y.one('#nav li.form').addClass('selected');
-                        
-                        
-                        if (req.query && req.query.submit) {
-                            console.log('submitted');
-                            // prefill form fields
-                            var get = req.query;
-                            for(var name in get){
-                                if(get.hasOwnProperty(name)){
-                                    var value = get[name];
-                                    var el = Y.one('#test-form1 [name='+name+']');
-                                    el.set('value',value);
-                                    if(!el){
-                                        console.log('not found: "'+name+'"');
-                                    }
-                                }
-                            }    
-                        }
-                        
-                        
-                        var rules = 'bla';
-                        var localY = Y;
-                        var that = this;
-                        
-                        fs.readFile(__dirname + '/assets/form.rules.js','utf8', function (err, data) {
-                            if (err) throw err;
-                            var start = data.indexOf('[');
-                            if(start > 0){
-                                data = data.substring(start,data.length-1);
-                            }
-                            rules = JSON.parse(data);
-                            
-                        //     // this fails even though I use localY or that.Y
-                        //     var form = new localY.FormValidate({
-                        //         targetFormId: '#test-form1',
-                        //         debug: true,
-                        //         rules:[
-                        //           {
-                        //             name: 'firstname',
-                        //             required: true,
-                        //             requiredMsg: '"Vorname" ist ein Pflichtfeld!',
-                        //             validate: 'isText',
-                        //             validatedMsg: 'Bitte geben Sie nur Text in das Feld "Vorname" ein!'
-                        //           }
-                        //         ]
-                        //     })// .setErrorRenderer('label')
-                        //     .checkRules();
-                        });
+        });
+    });
+    
+    app.post('/form', function(req, res) {
+        console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n-------------------------------------------------');
+        fs.readFile(__dirname + '/assets/form.rules.js','utf8', function (err, data) {
+            if (err) throw err;
+            var start = data.indexOf('[');
+            if(start > 0){ // rules are not properly json. the start with rules= so it can be easily included
+                data = data.substring(start,data.length-1);
+            }
+            rules = JSON.parse(data);
 
-                        
-                        
-                        // works fine but can't access rules obviously
-                        var form = new localY.FormValidate({
-                            targetFormId: '#test-form1',
-                            debug: true,
-                            rules:[
-                              {
-                                name: 'firstname',
-                                required: true,
-                                requiredMsg: '"Vorname" ist ein Pflichtfeld!',
-                                validate: 'isText',
-                                validatedMsg: 'Bitte geben Sie nur Text in das Feld "Vorname" ein!'
-                              },
-                              {
-                                "name": "email",
-                                "required": true,
-                                "requiredMsg": "\"E-Mail\" ist ein Pflichtfeld!",
-                                "validate": "isEmail",
-                                "validatedMsg": "Bitte geben Sie eine gueltige E-Mail Adresse ein!"
-                              }
-                            ]
-                        })// .setErrorRenderer('label')
-                        .checkRules();
-
-
+            YUI({
+                filter: 'debug',
+                debug: DEBUG,
+                modules: {
+                    'form-validate': {
+                        //For more detail see this file..
+                        fullpath: __dirname + '/assets/form.js'
                     }
                 }
+            }).use('node', 'form-validate', 'querystring', function(page) {
+
+                res.render('form.html', {
+                    locals: {
+                        instance: page,
+                        content: '#content',
+                        sub: {
+                            title: 'demo'
+                        },
+                        after: function(Y, options, partial) {
+                            Y.one('title').set('innerHTML', 'demo');
+                            Y.all('#nav li.selected').removeClass('selected');
+                            Y.one('#nav li.form').addClass('selected');
+                            
+                            
+                            if (req.body && req.body .submit) {
+                                console.log('submitted');
+                                // prefill form fields
+                                var get = req.body;
+                                for(var name in get){
+                                    if(get.hasOwnProperty(name)){
+                                        var value = get[name];
+                                        var el = Y.one('#test-form1 [name='+name+']');
+                                        
+                                        console.log(el);
+                                        
+                                        if(el.item(0).get('type') == "radio"){
+                                            console.log('radio');
+                                        }else if((el.item(0).get('nodeName').toLowerCase() == 'select')){
+                                            console.log('select');
+                                        }else{
+                                            el.set('value',value);
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            // init validation
+                            var form = new Y.FormValidate({
+                                targetFormId: '#test-form1',
+                                debug: true,
+                                rules: rules
+                            })// .setErrorRenderer('label')
+                            .checkRules();
+
+                        }
+                    }
+                });
             });
         });
     });

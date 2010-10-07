@@ -1,12 +1,6 @@
 YUI.add('form-validate', function (Y) {
-    console.log('FormValidate:add');
-    window = Y.Browser.window;
-    document = Y.Browser.document;
-    navigator = Y.Browser.navigator;
-    
+
     Y.FormValidate = function (config) {
-        console.log('FormValidate:constructor1');
-        console.log(config);
         this.debug = false;
         this.config = config;
         this.targetFormObj = null;
@@ -14,22 +8,17 @@ YUI.add('form-validate', function (Y) {
         this.validators = {};
         this.renderers = {};
         this.renderer = '';
-        console.log('FormValidate:constructor2');
-        this.test();
         this._init(config);
-        console.log('FormValidate:constructor3');
         return this;
     };
     
     Y.FormValidate.prototype = {
         _init : function (config) {
-            console.log('FormValidate:init');
+            this.log('init');
             this.config = config;
-            console.log(this.config.targetFormId);
             this.targetFormObj = Y.one(this.config.targetFormId);
-            console.log(this.targetFormObj);
             if(!this.targetFormObj){
-                console.log('not found: '+this.config.targetFormId);
+                this.log('not found: '+this.config.targetFormId);
                 return;
             }
             this.addDefaultValidators();
@@ -38,11 +27,6 @@ YUI.add('form-validate', function (Y) {
             this.addEvents();
             return this;
         },
-        
-        test : function(){
-            console.log('FormValidate:test');
-        },
-        
         
         addValidator : function(name,func){
           this.validators[name] = func;
@@ -95,55 +79,52 @@ YUI.add('form-validate', function (Y) {
         },
         
         addDefaultErrorRenderers : function(){
-          this.addErrorRenderer('label',{
-            render : function(that){
-              that.highlightErrors();
-              for(var i = that.errors.length-1;i>=0;i--){
-                var e = that.errors[i];
-                var el = e.el;
-                if(e.el.length && e.el[0].type == 'radio'){
-                  el = e.el[0];
-                }
-                var label = that.getLabelOfObj(el);
-                if(!label){
-                  that.warn('Element: "'+el.name+'" has no Label!');
-                  return;
-                }
-                var error = document.createElement("span");
-                error.className = "error";
-                var errormsg = document.createTextNode(e.msg+' ');
-                error.appendChild(errormsg);
-                label.insertBefore(error,label.childNodes[0]);
-                label.focus();
-              }
-            },
-            unrender : function(that){
-              that.unhighlightErrors();
-              for(var i = that.errors.length-1;i>=0;i--){
-                var e = that.errors[i];
-                var el = e.el;
-                if(e.el.length && e.el[0].type == 'radio'){
-                  el = e.el[0];
-                }
-                var label = that.getLabelOfObj(el);
-                if(!label){
-                  return;
-                }
-                var error = label.childNodes[0];
-                label.removeChild(error);
-                error = null;
-              }
-            }
-          });
+          // this.addErrorRenderer('label',{
+          //   render : function(that){
+          //     that.highlightErrors();
+          //     for(var i = that.errors.length-1;i>=0;i--){
+          //       var e = that.errors[i];
+          //       var el = e.el;
+          //       if(e.el.length && e.el[0].type == 'radio'){
+          //         el = e.el[0];
+          //       }
+          //       var label = that.getLabelOfObj(el);
+          //       if(!label){
+          //         that.warn('Element: "'+el.name+'" has no Label!');
+          //         return;
+          //       }
+          //       var error = document.createElement("span");
+          //       error.className = "error";
+          //       var errormsg = document.createTextNode(e.msg+' ');
+          //       error.appendChild(errormsg);
+          //       label.insertBefore(error,label.childNodes[0]);
+          //       label.focus();
+          //     }
+          //   },
+          //   unrender : function(that){
+          //     that.unhighlightErrors();
+          //     for(var i = that.errors.length-1;i>=0;i--){
+          //       var e = that.errors[i];
+          //       var el = e.el;
+          //       if(e.el.length && e.el[0].type == 'radio'){
+          //         el = e.el[0];
+          //       }
+          //       var label = that.getLabelOfObj(el);
+          //       if(!label){
+          //         return;
+          //       }
+          //       var error = label.childNodes[0];
+          //       label.removeChild(error);
+          //       error = null;
+          //     }
+          //   }
+          // });
           
           this.addErrorRenderer('above',{
             render : function(that){
               that.highlightErrors();
               that.errorContainer = Y.Node.create('<div class="errors"><h3>Errors</h3></div>');
-              var head = document.createElement("h3");
-              var headtext = document.createTextNode("Errors");
               var ul = that.getErrorsAsList();
-              console.log(that.errorContainer);
               that.errorContainer.appendChild(ul);
               that.targetFormObj.get('parentNode').insertBefore(that.errorContainer,that.targetFormObj);
               that.errorContainer.one('a').focus();
@@ -157,63 +138,45 @@ YUI.add('form-validate', function (Y) {
             }
           });
           
-          this.addErrorRenderer('below',{
-            render : function(that){
-              that.errorContainer = document.createElement("div");
-              that.errorContainer.className = "errors";
-              var head = document.createElement("h4");
-              var headtext = document.createTextNode("Errors");
-              head.appendChild(headtext);
-              that.errorContainer.appendChild(head);
-              var ul = that.getErrorsAsList();
-              that.errorContainer.appendChild(ul);
-              that.targetFormObj.parentNode.insertBefore(that.errorContainer,that.targetFormObj.nextSibling); // only difference to "above"
-              that.errorContainer.getElementsByTagName('a')[0].focus();
-            },
-            unrender : function(that){
-              if(that.errorContainer){
-                that.errorContainer.parentNode.removeChild(that.errorContainer);
-                that.errorContainer = null;
-              }
-            }
-          });
+          // this.addErrorRenderer('below',{
+          //   render : function(that){
+          //     that.errorContainer = document.createElement("div");
+          //     that.errorContainer.className = "errors";
+          //     var head = document.createElement("h4");
+          //     var headtext = document.createTextNode("Errors");
+          //     head.appendChild(headtext);
+          //     that.errorContainer.appendChild(head);
+          //     var ul = that.getErrorsAsList();
+          //     that.errorContainer.appendChild(ul);
+          //     that.targetFormObj.parentNode.insertBefore(that.errorContainer,that.targetFormObj.nextSibling); // only difference to "above"
+          //     that.errorContainer.getElementsByTagName('a')[0].focus();
+          //   },
+          //   unrender : function(that){
+          //     if(that.errorContainer){
+          //       that.errorContainer.parentNode.removeChild(that.errorContainer);
+          //       that.errorContainer = null;
+          //     }
+          //   }
+          // });
         },
         
         getErrorsAsList : function(){
           var ul = Y.Node.create('<ul>');
           for(var i=0, l=this.errors.length; i<l; i++){
             var e = this.errors[i];
-            //var li = document.createElement("li");
             var li = Y.Node.create('<li>');
-            //var t = document.createTextNode(e.msg);
-            
-            //var a = document.createElement("a");
             var a = Y.Node.create('<a href="'+'#'+e.el.get('id')+'">'+e.msg+'</a>');
-            //a.href = '#'+e.el.id;
             a.on('click', function(e){
                 e.preventDefault();
-                console.log(this);
                 var targetId = '#'+this.get('href').split('#')[1];
-                console.log(targetId);
                 var t = Y.one(targetId);
                 if(t.get('length') && (t.item(0).get('type') == 'radio')){
                     t = t.item(0);
                 }
                 t.focus();
             });
-            // a.onclick = function(){
-            //   var targetId = this.href.split('#')[1];
-            //   var t = document.getElementById(targetId);
-            //   if(t.length && (t[0].type == 'radio')){
-            //     t = t[0];
-            //   }
-            //   t.focus();
-            //   return false;
-            // };
             li.appendChild(a);
             ul.appendChild(li);
-            console.log('errors ul:')
-            console.log(ul.get('innerHTML'));
           }
           return ul;
         },
@@ -308,10 +271,8 @@ YUI.add('form-validate', function (Y) {
 
           //if(el.size() > 1){
             if(el.item(0).get('type') == "radio" && rule.required){
-                console.log('type:radiobutton')
                 var checked = false;
                 el.each(function(node){
-                    console.log(node.get('checked'));
                     if(node.get('checked')){
                         checked = true;
                     }
@@ -322,18 +283,14 @@ YUI.add('form-validate', function (Y) {
                 this.addError(el.item(0),rule.requiredMsg); // Error - selection required
                 return;
             }else if((el.item(0).get('nodeName').toLowerCase() == 'select') && rule.required){
-                console.log('type:selectbox');
-                console.log(el.item(0).get('options').item(el.item(0).get("selectedIndex")).get("value"));
-                if(el.item(0).get('options').item(el.item(0).get("selectedIndex")).get("value") === ''){
+                //console.log(el.item(0).get('options').item(el.item(0).get("selectedIndex")).get("value"));
+                if(el.item(0).get("value") === ''){
                     this.addError(el.item(0),rule.requiredMsg); // Error - selection required
                     return;
                 }
             }
           //}
           if(el.item(0).get('type') == "text"){
-              console.log("el.get('value')");
-              console.log(el.item(0).get('value'));
-              console.log(!el.item(0).get('value'));
             if(!rule.required && !el.item(0).get('value')){ 
               return; // do not validate when Input is empty and not required
             }
@@ -360,7 +317,6 @@ YUI.add('form-validate', function (Y) {
         },
         
         addError : function(el,msg){
-            console.log('add error: ',msg)
             this.errors[this.errors.length] = {el:el,msg:msg};
         },
         
@@ -441,14 +397,14 @@ YUI.add('form-validate', function (Y) {
         // },
         
         log : function(msg){
-            if(this.config.debug && window.console && window.console.log){
-                window.console.log(msg);
+            if(this.config.debug && Y.config.win.console && Y.config.win.console.log){
+                Y.config.win.console.log(msg);
             }
         },
         
         warn : function(msg){
-          if(this.config.debug && window.console && window.console.warn){
-            window.console.warn(msg);
+          if(this.config.debug && Y.config.win.console && Y.config.win.console.warn){
+            Y.config.win.console.warn(msg);
           }
         }
     };

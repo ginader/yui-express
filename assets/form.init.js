@@ -3,7 +3,7 @@ YUI().use('form-validate', function (Y) {
     Y.on("domready", function(){
         testForm = new Y.FormValidate({
             targetFormId: "#test-form1",
-            // debug:true,
+            debug:true,
             rules:rules
         });
         testForm.addValidator('isGermanPLZ',function(el){
