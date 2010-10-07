@@ -1,4 +1,6 @@
-This is the source code for: http://express.davglass.com/
+This is an extended Version of Dav Glass' Code that runs: http://express.davglass.com/
+
+I added a form validation example that completely reuses the javascript to do form validation on the frontend and on the backend thanks to the power of yui3 on both ends.
 
 You must have git, NodeJS 0.2.1 and npm 0.2.0 installed
 
@@ -8,7 +10,7 @@ To use it, follow these simple steps:
     npm install yui3-gallery
     npm install yui3-2in3
 
-    git clone git://github.com/davglass/yui-express.git
+    git clone git://github.com/ginader/yui-express.git
 
     cd yui-express
 
