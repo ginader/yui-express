@@ -489,7 +489,7 @@ YUI({ debug: false }).use('express', 'node', function(Y) {
                             Y.one('#nav li.form').addClass('selected');
                             
                             
-                            if (req.body && req.body .submit) {
+                            if (req.body && req.body.submit) {
                                 console.log('submitted');
                                 // prefill form fields
                                 var get = req.body;
